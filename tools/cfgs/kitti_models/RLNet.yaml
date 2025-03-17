@@ -1,35 +1,38 @@
 CLASS_NAMES: ['Car', 'Pedestrian', 'Cyclist']
 
-#- data_processor里方法究竟有没有被调用？
-#- 前几个epoch跳过移动：train_utils.py 里动态添加当前epoch信息？
-#- mos的evaluate部分加上，一起输出结果 准确率 同时需要记录移动的雷达点数 → second_net.py
-# `post_processing`
 #- 提取mos特征和提取的radar特征融合 → 维度匹配，RLNet的维度？ MOS移动前提取的特征 和移动后提取的不太一样吧
+# 查看ckpt存储情况
 
 DATA_CONFIG:
     _BASE_CONFIG_: cfgs/dataset_configs/vod_bimodal.yaml
+    # 写在这里的优先级更高，可以筛选
     DATA_PROCESSOR:
-        - NAME: transform_points_to_voxels
-          VOXEL_SIZE: [0.05, 0.05, 0.1]
-          MAX_POINTS_PER_VOXEL: 5
-          MAX_NUMBER_OF_VOXELS: {
-            'train': 150000,
-            'test': 150000
-          }
+      - NAME: remove_ground_points
+        DISTANCE_THRESHOLD: 0.05
 
-          VOXEL_SIZE_BEV: [0.4, 0.4, 5]
-          MAX_POINTS_PER_VOXEL_BEV: 30
-          MAX_NUMBER_OF_VOXELS_BEV: {
-            'train': 150000,
-            'test': 150000
-          }
+      - NAME: transform_points_to_voxels
+        VOXEL_SIZE: [0.05, 0.05, 0.1]
+        MAX_POINTS_PER_VOXEL: 5
+        MAX_NUMBER_OF_VOXELS: {
+          'train': 150000,
+          'test': 150000
+        }
+
+        VOXEL_SIZE_BEV: [0.4, 0.4, 5]
+        MAX_POINTS_PER_VOXEL_BEV: 30
+        MAX_NUMBER_OF_VOXELS_BEV: {
+          'train': 150000,
+          'test': 150000
+        }
+
 
 
 MODEL:
     NAME: SECONDNet
 
-    MOS:
-        NAME: RadarMOSNet
+#    MOS:
+#        NAME: RadarMOSNet
+#        THRESHOLD: 0.5
 
     VFE:
         NAME: MeanVFE
@@ -37,12 +40,14 @@ MODEL:
     VFE_LIDAR:
         NAME: MeanVFE_Lidar
 
+    # 提取Radar/LiDAR稠密特征
     BACKBONE_3D:
         NAME: VoxelResBackBone8x
 
     BACKBONE_3D_LIDAR:
         NAME: VoxelResBackBone8x_Lidar
 
+    # 在此进行RLNet特征融合
     MAP_TO_BEV:
         NAME: HeightCompression
         NUM_BEV_FEATURES: 256

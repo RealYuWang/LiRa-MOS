@@ -28,10 +28,11 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
         batch_time = common_utils.AverageMeter()
         forward_time = common_utils.AverageMeter()
         losses_m = common_utils.AverageMeter()
+        # mos_accs = common_utils.AverageMeter()
 
     end = time.time()
 
-    # 开始一个epoch的训练
+    # 开始本epoch的训练
     for cur_it in range(start_it, total_it_each_epoch): # 训练集大小 / batch_size = total_it_each_epoch
         try:
             batch = next(dataloader_iter)
@@ -49,6 +50,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
         except:
             cur_lr = optimizer.param_groups[0]['lr']
 
+        # tensorboard 记录学学习率
         if tb_log is not None:
             tb_log.add_scalar('meta_data/learning_rate', cur_lr, accumulated_iter)
 
@@ -83,6 +85,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
             forward_time.update(avg_forward_time)
             batch_time.update(avg_batch_time)
             losses_m.update(loss.item() , batch_size)
+            # mos_accs.update(tb_dict['mos_acc'], batch_size)
             
             disp_dict.update({
                 'loss': loss.item(), 'lr': cur_lr, 'd_time': f'{data_time.val:.2f}({data_time.avg:.2f})',
@@ -101,6 +104,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                     logger.info(
                         'Train: {:>4d}/{} ({:>3.0f}%) [{:>4d}/{} ({:>3.0f}%)]  '
                         'Loss: {loss.val:#.4g} ({loss.avg:#.3g})  '
+                        # 'MOS Acc: {mos_acc.val:#.4g} ({mos_acc.avg:#.3g})  '
                         'LR: {lr:.3e}  '
                         f'Time cost: {tbar.format_interval(trained_time_each_epoch)}/{tbar.format_interval(remaining_second_each_epoch)} ' 
                         f'[{tbar.format_interval(trained_time_past_all)}/{tbar.format_interval(remaining_second_all)}]  '
@@ -111,6 +115,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                             cur_epoch+1,total_epochs, 100. * (cur_epoch+1) / total_epochs,
                             cur_it,total_it_each_epoch, 100. * cur_it / total_it_each_epoch,
                             loss=losses_m,
+                            # mos_acc=mos_accs,
                             lr=cur_lr,
                             acc_iter=accumulated_iter,
                             data_time=data_time,
@@ -199,6 +204,7 @@ def train_model(model, optimizer, train_loader, model_func, lr_scheduler, optim_
 
             # save trained model
             trained_epoch = cur_epoch + 1
+            # print(f'Trained epoch {trained_epoch}, rank {rank}, {ckpt_save_interval}')
             if trained_epoch % ckpt_save_interval == 0 and rank == 0:
 
                 ckpt_list = glob.glob(str(ckpt_save_dir / 'checkpoint_epoch_*.pth'))

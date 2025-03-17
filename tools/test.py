@@ -1,4 +1,6 @@
 import _init_path
+import warnings
+warnings.simplefilter("ignore")
 import argparse
 import datetime
 import glob
@@ -69,7 +71,7 @@ def eval_single_ckpt(model, test_loader, args, eval_output_dir, logger, epoch_id
 
 
 def get_no_evaluated_ckpt(ckpt_dir, ckpt_record_file, args):
-    # ckpt_dir: output/kitti_models/RLNet/default/ckpt
+    # ckpt_dir: output/kitti_models/RLNet_mos_40/default/ckpt
     ckpt_list = glob.glob(os.path.join(ckpt_dir, '*checkpoint_epoch_*.pth'))
     ckpt_list.sort(key=os.path.getmtime)
     evaluated_ckpt_list = [float(x.strip()) for x in open(ckpt_record_file, 'r').readlines()]
@@ -201,9 +203,12 @@ def main():
 
     model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=test_set)
     with torch.no_grad():
+        # 默认评估所有checkpoints
         if args.eval_all:
+            print('repeat_eval_ckpt....')
             repeat_eval_ckpt(model, test_loader, args, eval_output_dir, logger, ckpt_dir, dist_test=dist_test)
         else:
+            print('eval_single_ckpt....')
             eval_single_ckpt(model, test_loader, args, eval_output_dir, logger, epoch_id, dist_test=dist_test)
 
 

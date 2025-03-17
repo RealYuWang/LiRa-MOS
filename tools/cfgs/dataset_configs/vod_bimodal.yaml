@@ -48,6 +48,9 @@ DATA_PROCESSOR:
         'test': False
       }
 
+    - NAME: remove_ground_points
+      DISTANCE_THRESHOLD: 0.05
+
     - NAME: transform_points_to_voxels
       VOXEL_SIZE: [0.05, 0.05, 0.1]
       MAX_POINTS_PER_VOXEL: 5
@@ -57,6 +60,3 @@ DATA_PROCESSOR:
       }
       VOXEL_SIZE_BEV: [ 0.4, 0.4, 5 ]
       MAX_POINTS_PER_VOXEL_BEV: 30
-
-    - NAME: remove_ground_points
-      DISTANCE_THRESHOLD: 0.05
