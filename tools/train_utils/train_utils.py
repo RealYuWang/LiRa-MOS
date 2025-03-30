@@ -28,7 +28,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
         batch_time = common_utils.AverageMeter()
         forward_time = common_utils.AverageMeter()
         losses_m = common_utils.AverageMeter()
-        # mos_accs = common_utils.AverageMeter()
+        mos_accs = common_utils.AverageMeter()
 
     end = time.time()
 
@@ -204,6 +204,12 @@ def train_model(model, optimizer, train_loader, model_func, lr_scheduler, optim_
 
             # save trained model
             trained_epoch = cur_epoch + 1
+            # 存储半路ckpt
+            if trained_epoch == 40:
+                ckpt_name = '/home/yu/OpenPCDet/data/checkpoint_epoch_40'
+                save_checkpoint(
+                    checkpoint_state(model, optimizer, trained_epoch, accumulated_iter), filename=ckpt_name,
+                )
             # print(f'Trained epoch {trained_epoch}, rank {rank}, {ckpt_save_interval}')
             if trained_epoch % ckpt_save_interval == 0 and rank == 0:
 

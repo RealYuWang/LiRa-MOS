@@ -11,18 +11,15 @@ cfg_from_yaml_file(model_cfg_file, cfg) # 自动加载了数据集配置文件�
 train_set, train_loader, _ = build_dataloader(
     dataset_cfg=cfg.DATA_CONFIG,
     class_names=cfg.CLASS_NAMES,
-    batch_size=8,
+    batch_size=12,
     dist=False, workers=8,
     logger=None,
     training=True
 )
 
 batch = next(iter(train_loader))
-# points = batch['points']
-# batch_indices = np.unique(points[:, 0])
-# for batch_idx in batch_indices:
-#     batch_points = points[points[:, 0] == batch_idx]  # 过滤出当前 batch 的点
-#     print(f"Batch {int(batch_idx)}: {batch_points.shape[0]} points")
+points = batch['points']
+print(points.shape)
 
 load_data_to_gpu(batch)
 

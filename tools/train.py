@@ -144,8 +144,10 @@ def main():
         model.load_params_from_file(filename=args.pretrained_model, to_cpu=dist_train, logger=logger)
 
     if args.ckpt is not None:
+        print('Training from checkpoint %s' % args.ckpt)
         it, start_epoch = model.load_params_with_optimizer(args.ckpt, to_cpu=dist_train, optimizer=optimizer, logger=logger)
         last_epoch = start_epoch + 1
+        print('Start epoch %d' % start_epoch)
     else:
         ckpt_list = glob.glob(str(ckpt_dir / '*.pth'))
               
@@ -230,6 +232,8 @@ def main():
     logger.info('**********************End evaluation %s/%s(%s)**********************' %
                 (cfg.EXP_GROUP_PATH, cfg.TAG, args.extra_tag))
 
+    logger.info('**********************Training Finished, Suspending system**********************')
+    os.system('systemctl suspend')
 
 if __name__ == '__main__':
     main()
