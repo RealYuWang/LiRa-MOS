@@ -85,7 +85,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
             forward_time.update(avg_forward_time)
             batch_time.update(avg_batch_time)
             losses_m.update(loss.item() , batch_size)
-            # mos_accs.update(tb_dict['mos_acc'], batch_size)
+            mos_accs.update(tb_dict['mos_acc'], batch_size)
             
             disp_dict.update({
                 'loss': loss.item(), 'lr': cur_lr, 'd_time': f'{data_time.val:.2f}({data_time.avg:.2f})',
@@ -104,7 +104,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                     logger.info(
                         'Train: {:>4d}/{} ({:>3.0f}%) [{:>4d}/{} ({:>3.0f}%)]  '
                         'Loss: {loss.val:#.4g} ({loss.avg:#.3g})  '
-                        # 'MOS Acc: {mos_acc.val:#.4g} ({mos_acc.avg:#.3g})  '
+                        'MOS Acc: {mos_acc.val:#.4g} ({mos_acc.avg:#.3g})  '
                         'LR: {lr:.3e}  '
                         f'Time cost: {tbar.format_interval(trained_time_each_epoch)}/{tbar.format_interval(remaining_second_each_epoch)} ' 
                         f'[{tbar.format_interval(trained_time_past_all)}/{tbar.format_interval(remaining_second_all)}]  '
@@ -115,7 +115,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                             cur_epoch+1,total_epochs, 100. * (cur_epoch+1) / total_epochs,
                             cur_it,total_it_each_epoch, 100. * cur_it / total_it_each_epoch,
                             loss=losses_m,
-                            # mos_acc=mos_accs,
+                            mos_acc=mos_accs,
                             lr=cur_lr,
                             acc_iter=accumulated_iter,
                             data_time=data_time,
@@ -165,7 +165,6 @@ def train_model(model, optimizer, train_loader, model_func, lr_scheduler, optim_
     hook_config = cfg.get('HOOK', None) 
     augment_disable_flag = False
 
-
     with tqdm.trange(start_epoch, total_epochs, desc='epochs', dynamic_ncols=True, leave=(rank == 0)) as tbar:
         total_it_each_epoch = len(train_loader)
         if merge_all_iters_to_one_epoch:
@@ -210,7 +209,7 @@ def train_model(model, optimizer, train_loader, model_func, lr_scheduler, optim_
                 save_checkpoint(
                     checkpoint_state(model, optimizer, trained_epoch, accumulated_iter), filename=ckpt_name,
                 )
-            # print(f'Trained epoch {trained_epoch}, rank {rank}, {ckpt_save_interval}')
+
             if trained_epoch % ckpt_save_interval == 0 and rank == 0:
 
                 ckpt_list = glob.glob(str(ckpt_save_dir / 'checkpoint_epoch_*.pth'))

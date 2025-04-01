@@ -57,7 +57,7 @@ def eval_one_epoch(cfg, args, model, dataloader, epoch_id, logger, dist_test=Fal
         progress_bar = tqdm.tqdm(total=len(dataloader), leave=True, desc='eval', dynamic_ncols=True)
     start_time = time.time()
 
-    # mos_acc = []
+    mos_acc = []
     for i, batch_dict in enumerate(dataloader):
         load_data_to_gpu(batch_dict)
 
@@ -67,7 +67,7 @@ def eval_one_epoch(cfg, args, model, dataloader, epoch_id, logger, dist_test=Fal
         with torch.no_grad():
             # eval模式调用post_processing，返回pred_dicts, recall_dicts
             pred_dicts, ret_dict = model(batch_dict)
-            # mos_acc.append(ret_dict['mos_acc'])
+            mos_acc.append(ret_dict['mos_acc'])
         disp_dict = {}
 
         if getattr(args, 'infer_time', False):
@@ -85,7 +85,7 @@ def eval_one_epoch(cfg, args, model, dataloader, epoch_id, logger, dist_test=Fal
         if cfg.LOCAL_RANK == 0:
             progress_bar.set_postfix(disp_dict)
             progress_bar.update()
-    # print(f'Avg MOS Acc: {sum(mos_acc) / len(mos_acc)}')
+    print(f'Avg MOS Acc: {sum(mos_acc) / len(mos_acc)}')
 
     if cfg.LOCAL_RANK == 0:
         progress_bar.close()

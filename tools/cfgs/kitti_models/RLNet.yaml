@@ -1,10 +1,8 @@
 CLASS_NAMES: ['Car', 'Pedestrian', 'Cyclist']
 
-# MOS 重复移动点，一次就够了？ 每次移动的是什么点？
 # new idea 问问claude
-# mos特征再加到 lidar特征
-# 新的mos架构 -> 再怎么改也不过提高1-2个点，训练时间却很长，有必要吗
-# 多存几个ckpt
+
+
 
 DATA_CONFIG:
     _BASE_CONFIG_: cfgs/dataset_configs/vod_bimodal.yaml
@@ -140,7 +138,7 @@ MODEL:
 
 
 OPTIMIZATION:
-    BATCH_SIZE_PER_GPU: 10
+    BATCH_SIZE_PER_GPU: 8
     NUM_EPOCHS: 80
 
     OPTIMIZER: adam_onecycle
