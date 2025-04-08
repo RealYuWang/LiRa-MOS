@@ -85,7 +85,7 @@ def eval_one_epoch(cfg, args, model, dataloader, epoch_id, logger, dist_test=Fal
         if cfg.LOCAL_RANK == 0:
             progress_bar.set_postfix(disp_dict)
             progress_bar.update()
-    print(f'Avg MOS Acc: {sum(mos_acc) / len(mos_acc)}')
+    logger.info(f'Avg MOS Acc: {sum(mos_acc) / len(mos_acc)}')
 
     if cfg.LOCAL_RANK == 0:
         progress_bar.close()

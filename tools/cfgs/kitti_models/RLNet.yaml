@@ -1,12 +1,7 @@
 CLASS_NAMES: ['Car', 'Pedestrian', 'Cyclist']
-
-# new idea 问问claude
-
-
-
 DATA_CONFIG:
     _BASE_CONFIG_: cfgs/dataset_configs/vod_bimodal.yaml
-    # 写在这里的优先级更高，可以筛选
+    # 写在这里的优先级更高，只执行这里的函数
     DATA_PROCESSOR:
       - NAME: remove_ground_points
         DISTANCE_THRESHOLD: 0.05
@@ -25,15 +20,11 @@ DATA_CONFIG:
           'train': 150000,
           'test': 150000
         }
-
-
-
 MODEL:
     NAME: SECONDNet
 
     MOS:
         NAME: PointMOS
-#        NAME: RadarMOSNet
         THRESHOLD: 0.5
 
     VFE:
@@ -52,7 +43,7 @@ MODEL:
     # 在此进行RLNet特征融合
     MAP_TO_BEV:
         NAME: HeightCompression
-        NUM_BEV_FEATURES: 256
+        NUM_BEV_FEATURES: 256 # 特征翻倍后 经过Height Comrpession.py(MAP_TO_BEV_MODULE)后读取输入通道数为 其*2=512
         WEIGHT: True
 
     BACKBONE_2D:
